@@ -1,186 +1,413 @@
-﻿namespace banking_asssignment
+﻿
+namespace banking_asssignment
 {
-    internal class Account
+    public abstract class Account 
     {
-        public int account_number;
-        public string account_type;
-        public int acc_balance;
 
-        public int Account_number
-        {
-            set { account_number = value; }
-            get { return account_number; }
-        }
-        public string Account_type
-        {
-            set { account_type = value; }
-            get { return account_type; }
-        }
+        public static int LastAccNo = 1500;
+       
 
-        public int Acc_balance
+        public long AccountNumber { get; set; }
+        public string AccountType { get; set; }
+        public float AccountBalance { get; set; }
+        public Customer Owner { get; set; }
+
+        public Account(Customer owner, string accountType,float initialBalance)
         {
-            set { acc_balance = value; }
-            get { return acc_balance; }
+            AccountNumber = ++LastAccNo;
+            AccountType = accountType;
+            AccountBalance = initialBalance;
+            Owner = owner;
         }
 
-        public Account(int account_number, string account_type, int acc_balance)
+
+        public abstract void Deposit(long AccountNumber, float amount);
+
+        //AccountBalance += amount;
+
+
+
+        public abstract void Withdraw(long AccountNumber, float amount);
+     
+
+        
+
+
+        public override string ToString()
         {
-            this.account_number = account_number;
-            this.account_type = account_type;
-            this.acc_balance = acc_balance;
+            return $"AccountNumber : {AccountNumber},AccountType : {AccountType},AccountBalance = {AccountBalance}";
         }
-        //method overloading of deposit
+    }
 
-        public void DepositArea(int amount)
+
+
+    class SavingsAccount : Account
+    {
+        public const float interestRate = 4.5f;
+        public const double minimumBalance = 500;
+        
+        
+        public SavingsAccount(Customer owner, float intialBalance) : base(owner, "Savings",intialBalance)
         {
+            
+        }
 
-            if (amount > 0)
+        public override void Deposit(long accountnumber,float amount)
+        {
+            if (amount < 0)
             {
-                acc_balance = (int)(amount + acc_balance);
-                Console.WriteLine($"depositted the amount{amount},account_balance is {acc_balance}");
+                throw new InsufficientFundException("must be greater than zero");
             }
             else
             {
-                Console.WriteLine("amt should not be null");
+                AccountBalance += amount;
+               
             }
         }
-        public void DepositArea(double amount)
-        {
 
-            if (amount > 0)
+        public override void Withdraw(long accountnumber, float amount)
+        {
+            if ( AccountBalance - amount < 600)
             {
-                acc_balance = (int)(amount + acc_balance);
-                Console.WriteLine($"depositted the amount is {amount},account_balance is {acc_balance} ");
+                throw new InsufficientFundException("less than min balance");
             }
             else
             {
-                Console.WriteLine("amt should not be null");
+                AccountBalance -= amount;
+               
             }
         }
 
-        public void DepositArea(float amount)
+       
+     
+
+
+
+    }
+
+    public class CurrentAccount : Account
+    {
+
+        public float OverdraftLimit = 1000f;
+
+  
+        public CurrentAccount(Customer owner,float initialBalance) : base(owner, "current", initialBalance)
         {
-            if (amount > 0)
+            
+        }
+
+        public override void Withdraw(long accountnumber, float amount)
+        {
+            if ( AccountBalance + OverdraftLimit  < amount)
             {
-                acc_balance = (int)(amount + acc_balance);
-                Console.WriteLine($"depositted the amount is {amount},balance is {acc_balance} ");
+                throw new OverDraftLimitExcededException("limit exceede");
             }
             else
             {
-                Console.WriteLine("amt should not be null");
+                AccountBalance -= amount;
+                
             }
+
+
         }
-        //method overloading of withdraw
-        public void WithdrawArea(float amount)
+        public override void Deposit(long accountnumber, float amount)
         {
-            if (amount < acc_balance)
+            if (amount < 0)
             {
-                acc_balance -= (int)amount;
-                Console.WriteLine($"successful withdrawal here is amt {amount},balance is {acc_balance}");
+                throw new InsufficientFundException("amount is less than zero");
             }
             else
             {
-                Console.WriteLine("amount is higher than balance");
+                AccountBalance = amount + AccountBalance;
+                Console.WriteLine($"depositted the amount is {amount},balance is {AccountBalance} ");
             }
         }
 
-        public void WithdrawArea(int amount)
+     
+
+    }
+   public class ZeroBalanceAccount : Account
+   {
+        public float OverdraftLimit = 1000f;
+        public ZeroBalanceAccount(Customer owner,float initialBalance) : base(owner, "Zero Balance", initialBalance)
+        { 
+        
+        }
+
+        public override void Withdraw(long accountnumber, float amount)
         {
-            if (amount < acc_balance)
+            if (AccountBalance + OverdraftLimit < amount)
             {
-                acc_balance -= (int)amount;
-                Console.WriteLine($"successful withdrawal here is amt {amount},balance is {acc_balance}");
+                throw new OverDraftLimitExcededException("limit exceede");
             }
             else
             {
-                Console.WriteLine("amount is higher than balance");
+                AccountBalance -= amount;
+
             }
+
+
         }
-
-
-        public virtual void WithdrawArea(double amount)
+        public override void Deposit(long accountnumber, float amount)
         {
-            if (amount < acc_balance)
+            if (amount < 0)
             {
-                acc_balance -= (int)amount;
-                Console.WriteLine($"successful withdrawal here is amt {amount},balance is {acc_balance}");
+                throw new InsufficientFundException("amount is less than zero");
             }
             else
             {
-                Console.WriteLine("amount is higher than balance");
-            }
-        }
-
-
-
-        //display
-        public void Display()
-        {
-            Console.WriteLine($"AccountNumber : {account_number},AccountType : {account_type},AccountBalance = {acc_balance}");
-        }
-
-        //interest
-        public virtual void CalculateInterest()
-        {
-            if (account_type == "savings")
-            {
-                double Interest_Amt = acc_balance * 4.5;
-                acc_balance = (int)(acc_balance + Interest_Amt);
-                Console.WriteLine($"Interest amount is {Interest_Amt} and account balance is {acc_balance}");
-
-            }
-            else
-            {
-                Console.WriteLine("Interest can be found for savings acct only");
-
+                AccountBalance = amount + AccountBalance;
+                Console.WriteLine($"depositted the amount is {amount},balance is {AccountBalance} ");
             }
         }
 
     }
-        //Inheritance
-        class SavingAccount : Account
-        {
-            private double InterestRate;
-
-            public SavingAccount(int account_number, double acc_balance, double interestRate = 4.5) : base(account_number, "savings", (int)acc_balance)
-            {
-                this.InterestRate = interestRate;
-            }
-
-            public override void CalculateInterest()
-            {
-                double interest_amt = acc_balance * 4.5;
-                acc_balance += (int)interest_amt;
-                Console.WriteLine($"Interest amt is {interest_amt} and balance is {acc_balance}");
-            }
-
-        }
-
-        class CurrentAccount : Account
-        {
 
 
-            private const double overdraftlimit = 3000.00;
-
-            public CurrentAccount(int account_number, double acc_balance) : base(account_number, "current", (int)acc_balance)
-            {
-
-            }
-
-            public override void WithdrawArea(double amount)
-            {
-                if (amount < acc_balance)
-                {
-                    acc_balance -= (int)amount;
-                    Console.WriteLine($"successful withdrawal here is amt {amount},balance is {acc_balance}");
-                }
-                else
-                {
-                    Console.WriteLine("amount is higher than balance");
-                }
-
-
-            }
-        } 
-    
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //public void Deposit(float amount)
+        //{
+
+        //    if (amount > 0)
+        //    {
+        //        acc_balance = (int)(amount + acc_balance);
+        //        Console.WriteLine($"depositted the amount{amount},account_balance is {acc_balance}");
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("amt should not be null");
+        //    }
+        //}
+
+        //public void Withdraw(float amount)
+        //{
+        //    if (amount < acc_balance)
+        //    {
+        //        acc_balance -= (int)amount;
+        //        Console.WriteLine($"successful withdrawal here is amt {amount},balance is {acc_balance}");
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("amount is higher than balance");
+        //    }
+        //}
+
+        //public void Transfer(long FromAccount, int ToAccount, float Amount)
+        //{
+
+        //    if (Amount < acc_balance)
+        //    {
+        //        acc_balance -= (int)Amount;
+        //        ToAccount.acc_balance += Amount;
+        //        Console.WriteLine($"Transfer done amt is {Amount},new balance is :{acc_balance} ");
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("less balance than amount");
+        //    }
+
+        //}
+
+    
+
+
+
+
+
+        //public void DepositArea(double amount)
+        //{
+
+        //    if (amount > 0)
+        //    {
+        //        acc_balance = (int)(amount + acc_balance);
+        //        Console.WriteLine($"depositted the amount is {amount},account_balance is {acc_balance} ");
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("amt should not be null");
+        //    }
+        //}
+
+        //public virtual void DepositArea(float amount)
+        //{
+        //    if (amount > 0)
+        //    {
+        //        acc_balance = (int)(amount + acc_balance);
+        //        Console.WriteLine($"depositted the amount is {amount},balance is {acc_balance} ");
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("amt should not be null");
+        //    }
+        //}
+        ////method overloading of withdraw
+
+
+        //public  virtual void WithdrawArea(int amount)
+        //{
+        //    if (amount < acc_balance)
+        //    {
+        //        acc_balance -= (int)amount;
+        //        Console.WriteLine($"successful withdrawal here is amt {amount},balance is {acc_balance}");
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("amount is higher than balance");
+        //    }
+        //}
+
+
+        //public virtual void WithdrawArea(double amount)
+        //{
+        //    if (amount < acc_balance)
+        //    {
+        //        acc_balance -= (int)amount;
+        //        Console.WriteLine($"successful withdrawal here is amt {amount},balance is {acc_balance}");
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("amount is higher than balance");
+        //    }
+        //}
+
+
+
+
+        //public void Display()
+        //{
+        //    Console.WriteLine($"AccountNumber : {account_number},AccountType : {account_type},AccountBalance = {acc_balance}");
+        //}
+
+        ////interest
+        //public virtual void CalculateInterest()
+        //{
+        //    if (account_type == "savings")
+        //    {
+        //        double Interest_Amt = acc_balance * 4.5;
+        //        acc_balance = (int)(acc_balance + Interest_Amt);
+        //        Console.WriteLine($"Interest amount is {Interest_Amt} and account balance is {acc_balance}");
+
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("Interest can be found for savings acct only");
+
+        //    }
+        //}
+
+
+    //class SavingAccount : BankAccount
+    //{
+    //    public double InterestRate;
+
+    //    public SavingAccount(int account_number, double acc_balance, double interestRate = 4.5) : base(account_number, "savings", (int)acc_balance)
+    //    {
+    //        this.InterestRate = interestRate;
+    //    }
+
+    //    public override void CalculateInterest()
+    //    {
+    //        double interest_amt = acc_balance * 4.5;
+    //        acc_balance += (int)interest_amt;
+    //        Console.WriteLine($"Interest amt is {interest_amt} and balance is {acc_balance}");
+    //    }
+
+    //    public override void Withdraw(float amount)
+    //    {
+    //        if (amount < acc_balance)
+    //        {
+    //            acc_balance -= (int)amount;
+    //            Console.WriteLine($"successful withdrawal here is amt {amount},balance is {acc_balance}");
+    //        }
+    //        else
+    //        {
+    //            Console.WriteLine("amount is higher than balance");
+    //        }
+    //    }
+    //    public override void Deposit(float amount)
+    //    {
+    //        if (amount > 0)
+    //        {
+    //            acc_balance += (int)amount;
+    //            Console.WriteLine($"depositted the amount is {amount},balance is {acc_balance} ");
+    //        }
+    //        else
+    //        {
+    //            Console.WriteLine("amt should not be null");
+    //        }
+    //    }
+
+    //}
+
+    //class CurrentAccount : BankAccount
+    //{
+
+
+    //    public const double overdraftlimit = 3000.00;
+
+    //    public CurrentAccount(int account_number, double acc_balance) : base(account_number, "current", (int)acc_balance)
+    //    {
+            
+    //    }
+
+    //    public override void Withdraw(float amount)
+    //    {
+    //        if (amount < acc_balance + overdraftlimit)
+    //        {
+    //            acc_balance -= (int)amount;
+    //            Console.WriteLine($"successful withdrawal here is amt {amount},balance is {acc_balance}");
+    //        }
+    //        else
+    //        {
+    //            Console.WriteLine("amount is higher than balance");
+    //        }
+
+
+    //    }
+    //    public override void Deposit(float amount)
+    //    {
+    //        if (amount > 0)
+    //        {
+    //            acc_balance = (int)(amount + acc_balance);
+    //            Console.WriteLine($"depositted the amount is {amount},balance is {acc_balance} ");
+    //        }
+    //        else
+    //        {
+    //            Console.WriteLine("amt should not be null");
+    //        }
+    //    }
+
+    //    public override void CalculateInterest()
+    //    {
+    //        double interest_amt = acc_balance * 4.5;
+    //        acc_balance += (int)interest_amt;
+    //        Console.WriteLine($"Interest amt is {interest_amt} and balance is {acc_balance}");
+    //    }
+
+
+    //
+
