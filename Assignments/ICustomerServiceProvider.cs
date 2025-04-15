@@ -4,16 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace banking_asssignment
+namespace AdoAssignment
 {
-    public interface ICustomerServiceProvider
+    internal interface ICustomerServiceProvider
     {
         float GetAccountBalance(long accountNumber);
-        void Deposit(long AccountNumber,float Amount);
-        void Withdraw(long AccountNumber,float Amount);
-        void Transfer(long FromAccountNumber, int ToAccountNumber, float amount);
+        int Deposit(long AccountNumber, float Amount);
+        int Withdraw(long AccountNumber, float Amount);
+        int Transfer(long FromAccountNumber, int ToAccountNumber, float amount);
         void GetAccountDetails(long AccountNumber);
 
+
+        List<Transaction> GetTransactions(DateTime fromD, DateTime ToD);
 
     }
 }

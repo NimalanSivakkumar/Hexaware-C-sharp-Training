@@ -4,16 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace banking_asssignment
+namespace AdoAssignment
 {
-    public interface IBankServiceProvider
+    internal interface IBankServiceProvider
     {
-        void CreateAccount(Customer customer,string accType,float balance);
+        void CreateAccount(Customer customer, string accType, float balance);
         void ListAccounts();
 
         void CalculateInterest();
-
-
 
 
 

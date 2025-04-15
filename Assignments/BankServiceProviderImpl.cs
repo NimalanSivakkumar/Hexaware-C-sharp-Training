@@ -4,95 +4,99 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace banking_asssignment
+namespace AdoAssignment
 {
-    public class BankServiceProviderImpl : CustomerServiceProviderImpl, IBankServiceProvider
-    {
-        public string BranchName {  get; set; }
-
-
-        public string BranchAddress{ get; set; }
-
-        public BankServiceProviderImpl(string branchName,string branchAddress)
+    
+    
+        public class BankServiceProviderImpl : CustomerServiceProviderImpl, IBankServiceProvider
         {
-            BranchName = branchName;
-            BranchAddress = branchAddress;
-        }
-        
+            public string BranchName { get; set; }
 
 
+            public string BranchAddress { get; set; }
 
-        public void CreateAccount(Customer customer, String accountType, float balance)
-        {
-            Account newAccount = accountType switch
-
-            //accountType = accountType.ToLower();
-
-            //switch (accountType)
+            public BankServiceProviderImpl(string branchName, string branchAddress)
             {
-                "savings" => new SavingsAccount(customer, balance),
+                BranchName = branchName;
+                BranchAddress = branchAddress;
+            }
 
 
 
-                "current" => new CurrentAccount(customer, balance),
 
+            public void CreateAccount(Customer customer, String accountType, float balance)
+            {
+                 Account newAccountCreation = null;
 
-                "zerobalance" =>
-                    new ZeroBalanceAccount(customer, balance),
+                //accountType = accountType.ToLower();
 
+               if(accountType == "savings")
+               {
+                new SavingsAccount(customer, balance);
+               }
+               else if(accountType == "current")
+               {
+                new SavingsAccount(customer, balance);
+               }
+              else if (accountType =="zerobalance")
+              {
+                new SavingsAccount(customer, balance);
+              }
+              else
+              {
+                throw new InvalidAccountException("Invalid acct type bro");
+              }
 
-                _ =>
-                     throw new InvalidAccountException("Invalid account")
-
-            };
-
-
-                accounts.Add(newAccount);
-                Console.WriteLine($"Acc created : {newAccount.AccountNumber} ");
-
+               accounts.Add(newAccountCreation);
 
             }
-            
-        
 
-        public void ListAccounts()
-        {
-            if(accounts.Count() == 0)
+
+            public void ListAccounts()
             {
-                throw new InvalidAccountException("Invalid Account bro");
-            }
-            else
-            {
-                foreach (var account in accounts)
+                if (accounts.Count() == 0)
                 {
-                    Console.WriteLine(account.ToString());
-                }
-            }
-               
-        }
-
-
-        public void CalculateInterest()
-        {
-           
-            foreach(var account in accounts)
-            {
-                if(account is SavingsAccount savingsAccount)
-                {
-                    float interest = savingsAccount.AccountBalance * SavingsAccount.interestRate;
-                    savingsAccount.AccountBalance += interest;
-                    Console.WriteLine($"Interest calculated,amount:{interest}");
-
+                    throw new InvalidAccountException("Invalid Account bro");
                 }
                 else
                 {
-                    throw new InvalidAccountException("Account type is wrong");
+                    foreach (var account in accounts)
+                    {
+                        Console.WriteLine(account.ToString());
+                    }
                 }
-                
+
             }
 
+
+            public void CalculateInterest()
+            {
+
+                foreach (var account in accounts)
+                {
+                    if (account is SavingsAccount savingsAccount)
+                    {
+                        float interest = savingsAccount.AccountBalance * SavingsAccount.interestRate;
+                        savingsAccount.AccountBalance += interest;
+                        Console.WriteLine($"Interest calculated,amount:{interest}");
+
+                    }
+                    else
+                    {
+                        throw new InvalidAccountException("Account type is wrong");
+                    }
+
+                }
+
+            }
+
+
+
+
+
+
+
+
+
         }
-
-
-    }
 }

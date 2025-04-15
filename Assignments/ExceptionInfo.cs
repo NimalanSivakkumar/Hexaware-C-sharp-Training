@@ -4,16 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Exception_assignment
+namespace AdoAssignment
 {
-    public class InsufficientFundException : Exception
-    {
-        public InsufficientFundException(string message) : base(message) { }
-
     
-    }
+    
+        public class InsufficientFundException : Exception
+        {
+            public InsufficientFundException(string message) : base(message) { }
 
-    public class InvalidAccountException:Exception
+
+        }
+
+
+
+    public class InvalidAccountException : Exception
     {
         public InvalidAccountException(string message) : base(message) { }
     }
@@ -28,6 +32,5 @@ namespace Exception_assignment
     {
         public NullPointerException(string message) : base(message) { }
     }
-
-
 }
+
